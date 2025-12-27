@@ -190,7 +190,7 @@ resource "aws_instance" "app" {
               dnf update -y
               
               # Install PostgreSQL client
-              dnf install -y postgresql15
+              dnf install -y postgresql16
               
               # Create a connection script
               cat > /home/ec2-user/connect-db.sh << 'SCRIPT'
