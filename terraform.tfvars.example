@@ -1,0 +1,22 @@
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "dev"
+
+# Network Configuration
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+
+# Database Configuration
+db_name     = "appdb"
+db_username = "dbadmin"
+
+# Security Configuration
+# WARNING: Restricting to 0.0.0.0/0 allows access from anywhere.
+# For production, restrict these to specific IP ranges.
+allowed_ssh_cidr = "0.0.0.0/0"
+allowed_db_cidr  = "0.0.0.0/0"
+
+# EC2 Configuration
+# IMPORTANT: Create an EC2 key pair in AWS and specify its name here
+# If not set, you won't be able to SSH into the instance
+ec2_key_name = ""
