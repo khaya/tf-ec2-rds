@@ -1,7 +1,7 @@
 # Terraform EC2 and RDS Infrastructure
 
 This repository contains Terraform configurations to deploy an AWS infrastructure with:
-- **EC2 Instance**: t4g.nano ARM-based instance running Amazon Linux 2023
+- **EC2 Instance**: t4g.nano ARM-based instance running Ubuntu 22.04 LTS
 - **RDS PostgreSQL Database**: db.t4g.micro ARM-based instance with PostgreSQL 16
 - **Networking**: VPC with public subnets, Internet Gateway, and security groups
 - **Public Access**: RDS instance is publicly accessible for easy connectivity
@@ -102,7 +102,7 @@ If you configured an EC2 key pair:
 terraform output ssh_command
 
 # Or manually SSH
-ssh -i ~/.ssh/your-key.pem ec2-user@<ec2-public-ip>
+ssh -i ~/.ssh/your-key.pem ubuntu@<ec2-public-ip>
 ```
 
 Once connected to EC2, you can use the pre-configured connection script:
@@ -115,9 +115,9 @@ Once connected to EC2, you can use the pre-configured connection script:
 
 ### EC2 Instance
 - **Type**: t4g.nano (ARM64 architecture)
-- **OS**: Amazon Linux 2023
+- **OS**: Ubuntu 22.04 LTS (Jammy)
 - **Storage**: 8 GB encrypted GP3 volume
-- **Software**: PostgreSQL 15 client pre-installed
+- **Software**: PostgreSQL client pre-installed
 - **IMDSv2**: Enabled for enhanced security
 
 ### RDS Instance

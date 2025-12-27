@@ -62,5 +62,5 @@ output "connection_command" {
 
 output "ssh_command" {
   description = "Command to SSH into the EC2 instance (requires key pair)"
-  value       = var.ec2_key_name != "" ? "ssh -i ~/.ssh/${var.ec2_key_name}.pem ec2-user@${aws_instance.app.public_ip}" : "SSH key not configured. Set ec2_key_name variable to enable SSH access."
+  value       = var.ec2_key_name != "" ? "ssh -i ~/.ssh/${var.ec2_key_name}.pem ubuntu@${aws_instance.app.public_ip}" : "SSH key not configured. Set ec2_key_name variable to enable SSH access."
 }

@@ -3,14 +3,14 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Data source to get latest Amazon Linux 2023 ARM64 AMI
-data "aws_ami" "amazon_linux_2023_arm64" {
+# Data source to get latest Ubuntu 22.04 LTS ARM64 AMI
+data "aws_ami" "ubuntu_arm64" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["al2023-ami-*-kernel-*-arm64"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*"]
   }
 
   filter {
@@ -178,51 +178,19 @@ resource "aws_db_subnet_group" "main" {
 
 # EC2 Instance
 resource "aws_instance" "app" {
-  ami                    = data.aws_ami.amazon_linux_2023_arm64.id
+  ami                    = data.aws_ami.ubuntu_arm64.id
   instance_type          = "t4g.nano"
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.ec2.id]
   key_name               = var.ec2_key_name != "" ? var.ec2_key_name : null
 
-  user_data = <<-EOF
-              #!/bin/bash
-              # Update system
-              dnf update -y
-              
-              # Install PostgreSQL client
-              dnf install -y postgresql16
-              
-              # Create a connection script
-              cat > /home/ec2-user/connect-db.sh << 'SCRIPT'
-              #!/bin/bash
-              echo "Connecting to PostgreSQL database..."
-              echo "Host: ${aws_db_instance.postgres.address}"
-              echo "Port: ${aws_db_instance.postgres.port}"
-              echo "Database: ${aws_db_instance.postgres.db_name}"
-              echo "Username: ${aws_db_instance.postgres.username}"
-              echo ""
-              PGPASSWORD='${random_password.db_password.result}' psql -h ${aws_db_instance.postgres.address} -p ${aws_db_instance.postgres.port} -U ${aws_db_instance.postgres.username} -d ${aws_db_instance.postgres.db_name}
-              SCRIPT
-              
-              chmod +x /home/ec2-user/connect-db.sh
-              chown ec2-user:ec2-user /home/ec2-user/connect-db.sh
-              
-              # Save connection details
-              cat > /home/ec2-user/db-connection-info.txt << 'INFO'
-              Database Connection Information
-              ================================
-              Host: ${aws_db_instance.postgres.address}
-              Port: ${aws_db_instance.postgres.port}
-              Database: ${aws_db_instance.postgres.db_name}
-              Username: ${aws_db_instance.postgres.username}
-              Password: ${random_password.db_password.result}
-              
-              To connect, run: ./connect-db.sh
-              INFO
-              
-              chown ec2-user:ec2-user /home/ec2-user/db-connection-info.txt
-              chmod 600 /home/ec2-user/db-connection-info.txt
-              EOF
+  user_data = templatefile("${path.module}/user-data.sh", {
+    db_address  = aws_db_instance.postgres.address
+    db_port     = aws_db_instance.postgres.port
+    db_name     = aws_db_instance.postgres.db_name
+    db_username = aws_db_instance.postgres.username
+    db_password = random_password.db_password.result
+  })
 
   root_block_device {
     volume_size           = 8
