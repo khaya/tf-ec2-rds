@@ -217,7 +217,7 @@ resource "aws_db_instance" "postgres" {
 
   # Instance configuration
   engine            = "postgres"
-  engine_version    = "16.3"
+  engine_version    = "17.6"
   instance_class    = "db.t4g.micro"
   allocated_storage = 20
   storage_type      = "gp3"
@@ -250,7 +250,7 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot = true
 
   # Parameter group
-  parameter_group_name = "default.postgres16"
+  parameter_group_name = "default.postgres17"
 
   tags = {
     Name = "${var.environment}-postgres-db"
