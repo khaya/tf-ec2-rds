@@ -211,6 +211,33 @@ resource "aws_instance" "app" {
   depends_on = [aws_db_instance.postgres]
 }
 
+# imported instance
+
+resource "aws_instance" "imported_app" {
+  # Replace with your existing instance ID
+  ami = "ami-03a2ca7ac21e13086"
+  instance_type = "t4g.nano"
+  subnet_id = "subnet-014fe16f3adb4fd64"
+  vpc_security_group_ids = ["sg-0f0112b353215a4bf"]
+  key_name = var.ec2_key_name != "" ? var.ec2_key_name : null
+
+    root_block_device {
+    volume_size           = 8
+    volume_type           = "gp3"
+    encrypted             = false
+    delete_on_termination = true
+  }
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name = "int-app-instance"
+  }
+
+}
 # RDS PostgreSQL Instance
 resource "aws_db_instance" "postgres" {
   identifier_prefix = "${var.environment}-postgres-"
